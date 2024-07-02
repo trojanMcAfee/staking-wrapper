@@ -8,6 +8,7 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {TestMethods} from "../../../../foundry/base/TestMethods.sol";
 import {ozIToken} from "./../../../../../contracts/interfaces/ozIToken.sol";
 import {AmountsIn} from "./../../../../../contracts/AppStorage.sol";
+import {Mock} from "../../../../foundry/base/AppStorageTests.sol";
 
 import "forge-std/console.sol";
 
@@ -105,9 +106,15 @@ contract HelpersLogic is TestMethods {
     }
 
 
-    function _mock_aUSDC() internal {
+    function _mock_aUSDC(Mock mockType_, uint amountTokens_) internal {
         uint aUsdcBalance = IERC20(aUsdcAddr).balanceOf(address(OZ));
-        uint amountToMock = aUsdcBalance + aUsdcBalance.mulDivDown(800, 10_000);
+        uint amountToMock;
+
+        if (mockType_ == Mock.LENDING_AAVE) {
+            amountToMock = aUsdcBalance + aUsdcBalance.mulDivDown(800, 10_000);
+        } else if (mockType_ == Mock.ADD_AAVE) {
+            amountToMock = aUsdcBalance + amountTokens_;
+        }
 
         vm.mockCall( 
             aUsdcAddr,

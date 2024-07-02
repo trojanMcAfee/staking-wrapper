@@ -150,6 +150,7 @@ contract Setup is MockStorage, Test {
     uint24 uniPoolFee = 500; //0.05 - 500 -- change this to uniFee05
     uint24 uniFee01 = 100;
     uint24 protocolFee = 1_500; //15%
+    uint internal constant EPOCH = 7 days;
 
     /**
      * How many contracts can be paused + value for non-paused contracts + the flag index

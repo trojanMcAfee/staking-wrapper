@@ -10,6 +10,7 @@ import {AmountsIn} from "./../../../../contracts/AppStorage.sol";
 import {HelpersLogic} from "./helpers/HelpersLogic.sol";
 
 import {ozFenwickTree} from "./../../../../contracts/facets/ozFenwickTree.sol";
+import {Mock} from "../../../foundry/base/AppStorageTests.sol";
 
 
 import "forge-std/console.sol";
@@ -58,7 +59,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         amountToSwapRETH = _balancerPart(blockAccrual, true);
 
         //--------------------------------------
-        console.log('rETH_ETH - post epoch: ', OZ.rETH_ETH());
+        console.log('rETH_ETH - post 1st epoch: ', OZ.rETH_ETH());
         uint oldBalanceRETH = IERC20(rEthAddr).balanceOf(address(OZ));
 
         console.log('');
@@ -67,7 +68,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('--------------------');
         console.log('');
 
-        _mock_aUSDC(); 
+        _mock_aUSDC(Mock.LENDING_AAVE, 0); 
 
         assertTrue(OZ.executeRebaseSwap());
 
@@ -88,9 +89,24 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('');
 
         amountIn = IERC20(testToken).balanceOf(charlie);
-        console.log('amountIn ^^^^: ', amountIn);
-        // _makeUserDeposit(charlie, ozERC20, amountIn);
+        console.log('amountIn charlie: ', amountIn);
+        console.log('aUSDC balance diamond - pre charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
+        _makeUserDeposit(charlie, ozERC20, amountIn);
+        _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
         
+        oldRateRETH = OZ.rETH_ETH();
+        console.log('aUSDC balance diamond - post 2nd mock/charlie: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+        console.log('');
+        
+        //2nd rewards accrual event
+        vm.warp(block.timestamp + EPOCH);
+        _mock_rETH_ETH_diamond();
+        _mock_aUSDC(Mock.LENDING_AAVE, 0); 
+
+        assertTrue(oldRateRETH < OZ.rETH_ETH());
+        console.log('rETH_ETH - post 2nd epoch: ', OZ.rETH_ETH());
+        console.log('aUSDC balance diamond - post 2nd mock: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
     }
 

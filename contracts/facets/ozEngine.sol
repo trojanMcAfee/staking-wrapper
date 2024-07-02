@@ -136,7 +136,6 @@ contract ozEngine is Modifiers {
     function _lendToAave(uint amountInStable_, address stable_) private returns(uint) {
         address poolAave = IAave(s.poolProviderAave).getPool();
         IERC20(stable_).approve(poolAave, amountInStable_);
-
         IAave(poolAave).supply(stable_, amountInStable_, address(this), 0);
 
         return amountInStable_;
