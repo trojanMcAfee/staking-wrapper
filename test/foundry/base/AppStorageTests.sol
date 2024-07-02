@@ -11,6 +11,8 @@ import {AmountsIn, AmountsOut} from "../../../contracts/AppStorage.sol";
 * POSTACCRUAL_UNI - TWAP price with accrued rewards
 * PREACCRUAL_LINK - getUniPrice() using Chailink feeds.
 * POSTACCRUAL_LINK - Chainlink price with acrrued rewards.
+* LENDING_AAVE - simulates accrual of lending fees on USDC
+* ADD_AAVe - adds the incoming stable balance to the ozDiamond's aUSDC balance
 */
 enum Mock {
     PREACCRUAL_UNI,
@@ -21,6 +23,12 @@ enum Mock {
     POSTACCRUAL_LINK,
     LENDING_AAVE,
     ADD_AAVE
+}
+
+enum Rebase {
+    NONE,
+    FIRST,
+    SECOND
 }
 
 

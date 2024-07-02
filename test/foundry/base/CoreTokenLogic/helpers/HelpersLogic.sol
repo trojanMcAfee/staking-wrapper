@@ -8,7 +8,7 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {TestMethods} from "../../../../foundry/base/TestMethods.sol";
 import {ozIToken} from "./../../../../../contracts/interfaces/ozIToken.sol";
 import {AmountsIn} from "./../../../../../contracts/AppStorage.sol";
-import {Mock} from "../../../../foundry/base/AppStorageTests.sol";
+import {Mock, Rebase} from "../../../../foundry/base/AppStorageTests.sol";
 
 import "forge-std/console.sol";
 
@@ -33,19 +33,33 @@ contract HelpersLogic is TestMethods {
     }
 
 
-    function _constructBalancerSwap(bool isRebase_) internal view returns(
+    function _constructBalancerSwap(Rebase num_) internal view returns(
         IVault.SingleSwap memory, 
         IVault.FundManagement memory
     ) {
-        IAsset tokenIn = IAsset(isRebase_ ? rEthAddr : wethAddr);
-        IAsset tokenOut = IAsset(isRebase_ ? wethAddr : rEthAddr);
-        uint amountIn = isRebase_ ? 1924728482031253 : 28398352812392632;
+        address tokenIn;
+        address tokenOut;
+        uint amountIn;
+
+        if (num_ == Rebase.NONE) {
+            tokenIn = wethAddr;
+            tokenOut = rEthAddr;
+            amountIn = 28398352812392632;
+        } else if (num_ == Rebase.FIRST) {
+            tokenIn = rEthAddr;
+            tokenOut = wethAddr;
+            amountIn = 1924728482031253;
+        }
+
+        // IAsset tokenIn = IAsset(isRebase_ ? rEthAddr : wethAddr);
+        // IAsset tokenOut = IAsset(isRebase_ ? wethAddr : rEthAddr);
+        // uint amountIn = isRebase_ ? 1924728482031253 : 28398352812392632;
 
         IVault.SingleSwap memory singleSwap = IVault.SingleSwap({
             poolId: IPool(rEthWethPoolBalancer).getPoolId(),
             kind: IVault.SwapKind.GIVEN_IN,
-            assetIn: tokenIn,
-            assetOut: tokenOut,
+            assetIn: IAsset(tokenIn),
+            assetOut: IAsset(tokenOut),
             amount: amountIn,
             userData: new bytes(0)
         });
@@ -60,24 +74,41 @@ contract HelpersLogic is TestMethods {
         return (singleSwap, funds);
     }
 
-    function _balancerPart(uint blockAccrual, bool isRebase_) internal returns(uint) {
+    function _balancerPart(uint blockAccrual, Rebase num_) internal returns(uint) {
         (
             IVault.SingleSwap memory singleSwap, 
             IVault.FundManagement memory funds
-        ) = _constructBalancerSwap(isRebase_);
+        ) = _constructBalancerSwap(num_);
 
-        uint rateRETHETH = isRebase_ ? 1154401364401861932 : 1111038024285138135;
-        uint amountToSwap = isRebase_ ? 1924728482031253 : 28398352812392632;
-        uint swappedAmount = isRebase_ ? 
-            rateRETHETH.mulDivDown(amountToSwap, 1 ether) :
-            amountToSwap.mulDivDown(1 ether, rateRETHETH);
+        uint rateRETHETH;
+        uint amountToSwap;
+        uint swappedAmount;
+        address tokenToDeal;
+
+        if (num_ == Rebase.NONE) {
+            rateRETHETH = 1111038024285138135;
+            amountToSwap = 28398352812392632;
+            swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
+            tokenToDeal = rEthAddr;
+        } else if (num_ == Rebase.FIRST) {
+            rateRETHETH = 1154401364401861932;
+            amountToSwap = 1924728482031253;
+            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
+            tokenToDeal = wethAddr;
+        }
+
+        // uint rateRETHETH = isRebase_ ? 1154401364401861932 : 1111038024285138135;
+        // uint amountToSwap = isRebase_ ? 1924728482031253 : 28398352812392632;
+        // uint swappedAmount = isRebase_ ? 
+        //     rateRETHETH.mulDivDown(amountToSwap, 1 ether) :
+        //     amountToSwap.mulDivDown(1 ether, rateRETHETH);
         
         vm.mockCall(
             vaultBalancer,
             abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, 0, blockAccrual),
             abi.encode(swappedAmount)
         );
-        deal(isRebase_ ? wethAddr : rEthAddr, address(OZ), swappedAmount);
+        deal(tokenToDeal, address(OZ), swappedAmount);
 
         return amountToSwap;
     }

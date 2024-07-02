@@ -10,7 +10,7 @@ import {AmountsIn} from "./../../../../contracts/AppStorage.sol";
 import {HelpersLogic} from "./helpers/HelpersLogic.sol";
 
 import {ozFenwickTree} from "./../../../../contracts/facets/ozFenwickTree.sol";
-import {Mock} from "../../../foundry/base/AppStorageTests.sol";
+import {Mock, Rebase} from "../../../foundry/base/AppStorageTests.sol";
 
 
 import "forge-std/console.sol";
@@ -41,7 +41,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         //---- mock BALANCER WETH > rETH swap ----
         //Has to be a mock because balancer fails when swapping after warp
         //total rETH that'll be swapped, representing the staking rewards earned
-        uint amountToSwapRETH = _balancerPart(halfAccrual, false);
+        uint amountToSwapRETH = _balancerPart(halfAccrual, Rebase.NONE);
         _makeUserDeposit(bob, ozERC20, amountIn);
         //---------------------
 
@@ -56,7 +56,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         assertTrue(oldRateRETH < OZ.rETH_ETH());
         
         //---- mock BALANCER rETH > WETH swap ----
-        amountToSwapRETH = _balancerPart(blockAccrual, true);
+        amountToSwapRETH = _balancerPart(blockAccrual, Rebase.FIRST);
 
         //--------------------------------------
         console.log('rETH_ETH - post 1st epoch: ', OZ.rETH_ETH());
@@ -85,28 +85,53 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
 
         console.log('');
-        console.log('***** beginning of CHARLIE *****');
+        console.log('***** beginning of ALICE-CHARLIE DEPOSITS *****');
         console.log('');
 
         amountIn = IERC20(testToken).balanceOf(charlie);
-        console.log('amountIn charlie: ', amountIn);
-        console.log('aUSDC balance diamond - pre charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
+        vm.prank(charlie);
+        IERC20(testToken).transfer(alice, amountIn / 2);
+
+        amountIn = IERC20(testToken).balanceOf(alice);
+        console.log('amountIn alice: ', amountIn);
+        console.log('aUSDC balance diamond - pre alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
+        _makeUserDeposit(alice, ozERC20, amountIn);
+        _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
+
+        console.log('aUSDC balance diamond - post alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
+        amountIn = IERC20(testToken).balanceOf(charlie) / 2;
         _makeUserDeposit(charlie, ozERC20, amountIn);
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
-        
-        oldRateRETH = OZ.rETH_ETH();
-        console.log('aUSDC balance diamond - post 2nd mock/charlie: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
         console.log('');
+        console.log('amountIn alice: ', amountIn);
+        console.log('aUSDC balance diamond - post charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+        console.log('');
+
+        oldRateRETH = OZ.rETH_ETH();
         
         //2nd rewards accrual event
-        vm.warp(block.timestamp + EPOCH);
+        blockAccrual = block.timestamp + EPOCH;
+        vm.warp(blockAccrual);
         _mock_rETH_ETH_diamond();
         _mock_aUSDC(Mock.LENDING_AAVE, 0); 
 
         assertTrue(oldRateRETH < OZ.rETH_ETH());
         console.log('rETH_ETH - post 2nd epoch: ', OZ.rETH_ETH());
         console.log('aUSDC balance diamond - post 2nd mock: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
+        console.log('');
+        console.log('--------------------');
+        console.log('start of 2nd executeRebaseSwap');
+        console.log('--------------------');
+        console.log('');
+
+        // assertTrue(OZ.executeRebaseSwap());
+
+        // _balancerPart(blockAccrual, isRebase_);
 
     }
 
