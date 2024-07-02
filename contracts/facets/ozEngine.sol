@@ -419,59 +419,11 @@ contract ozEngine is Modifiers {
         //put the 7 days check
         if (s.rewardsStartTime + s.EPOCH < block.timestamp) return false;
 
-        //---- START of STAKING calcs ----
+        (uint amountOutUSDC, uint rateRETHETH) = _calculateStakingRewards();
+        if (amountOutUSDC == 0 && rateRETHETH == 0) return false;
 
-        uint rateRETHETH = Helpers.rETH_ETH(ozIDiamond(address(this)));
-        console.log('rateRETHETH: ', rateRETHETH);
-        if (rateRETHETH <= s.lastRebasePriceRETHETH) return false;
-
-        uint sysBalanceRETH = IERC20Permit(s.rETH).balanceOf(address(this));
-        console.log('sysBalanceRETH - pre swap: ', sysBalanceRETH);
-
-        uint sysBalanceConvertedETH = sysBalanceRETH.mulDivDown(rateRETHETH, 1 ether);
-        console.log('sysBalanceConvertedETH: ', sysBalanceConvertedETH);
-        console.log('');
-        console.log('s.sysBalanceETH: ', s.sysBalanceETH);
-
-        uint rewardsETH = sysBalanceConvertedETH - s.sysBalanceETH; //rETH rewards that'll be swapped for USDC
-        console.log('rewardsETH: ', rewardsETH);
-
-        uint amountToSwapRETH = rewardsETH.mulDivDown(1 ether, rateRETHETH);
-        console.log('amountToSwapRETH: ', amountToSwapRETH);
-
-        //******/
-        uint[] memory minAmountsOut = new uint[](2); //<--- given by a keeper
-        //******/
-
-        console.log('');
-        console.log('**** SWAP ****');
-        console.log('');
-
-        uint amountOutUSDC = _checkPauseAndSwap2(
-            s.rETH,
-            s.USDC,
-            address(this),
-            amountToSwapRETH,
-            minAmountsOut, //<----- has to be given by a keeper (one for rETH<>WETH - other WETH<>USDC)
-            Action.REBASE 
-        );
-        if (amountOutUSDC == 0) return false;
-
-        //---- START of LENDING calcs ----
-
-        uint totalAssets = _totalStables();
-        uint totalAtokens = IERC20(s.aUSDC).balanceOf(address(this));
-        uint lendingRewards = totalAtokens - totalAssets;
-
-        console.log('amountOutUSDC: ', amountOutUSDC);
-        console.log('lendingRewards: ', lendingRewards);
-        console.log('totalAtokens: ', totalAtokens);
-        console.log('totalAssets: ', totalAssets);
-        console.log('');
-
-        //---------------------------------
-        s.stakingRewardsUSDC += amountOutUSDC + lendingRewards;
-        s.lastRebasePriceRETHETH = rateRETHETH;
+        s.stakingRewardsUSDC += amountOutUSDC + _calculateLendingRewards();
+        s.lastRebasePriceRETHETH = rateRETHETH; //check if this is used
         s.rewardsStartTime = block.timestamp;
 
         console.log('s.stakingRewardsUSDC *****: ', s.stakingRewardsUSDC);
@@ -494,7 +446,7 @@ contract ozEngine is Modifiers {
             s.users[user].index++;
         }
 
-        uint length = s.depositsBuffer.length;
+        uint length = s.depositsBuffer.length; 
         address[] memory checkedUsers = new address[](length);
         uint checked_length = checkedUsers.length;
 
@@ -513,6 +465,54 @@ contract ozEngine is Modifiers {
         }
         delete s.depositsBuffer;
         return true;
+    }
+
+
+    function _calculateStakingRewards() private returns(uint, uint) {
+
+        uint rateRETHETH = Helpers.rETH_ETH(ozIDiamond(address(this)));
+        console.log('rateRETHETH: ', rateRETHETH);
+        if (rateRETHETH <= s.lastRebasePriceRETHETH) return (0, 0);
+
+        uint sysBalanceRETH = IERC20Permit(s.rETH).balanceOf(address(this));
+        console.log('sysBalanceRETH - pre swap: ', sysBalanceRETH);
+
+        uint sysBalanceConvertedETH = sysBalanceRETH.mulDivDown(rateRETHETH, 1 ether);
+        console.log('sysBalanceConvertedETH: ', sysBalanceConvertedETH);
+        console.log('');
+        console.log('s.sysBalanceETH: ', s.sysBalanceETH);
+
+        uint rewardsETH = sysBalanceConvertedETH - s.sysBalanceETH; //rETH rewards that'll be swapped for USDC
+        console.log('rewardsETH: ', rewardsETH);
+
+        uint amountToSwapRETH = rewardsETH.mulDivDown(1 ether, rateRETHETH);
+        console.log('amountToSwapRETH: ', amountToSwapRETH);
+
+        //******/
+        uint[] memory minAmountsOut = new uint[](2); //<--- given by a keeper (has to be passed as a param)
+        //******/
+
+        console.log('');
+        console.log('**** SWAP ****');
+        console.log('');
+
+        uint amountOutUSDC = _checkPauseAndSwap2(
+            s.rETH,
+            s.USDC,
+            address(this),
+            amountToSwapRETH,
+            minAmountsOut, //<----- has to be given by a keeper (one for rETH<>WETH - other WETH<>USDC)
+            Action.REBASE
+        );
+
+        return (amountOutUSDC, rateRETHETH);
+    }
+
+    function _calculateLendingRewards() private returns(uint) {
+        uint totalAssets = _totalStables();
+        uint totalAtokens = IERC20(s.aUSDC).balanceOf(address(this));
+        uint lendingRewards = totalAtokens - totalAssets;
+        return lendingRewards;
     }
 
 

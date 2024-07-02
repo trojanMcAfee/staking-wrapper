@@ -257,7 +257,6 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
         uint assets = amts.amountInStable.format(FORMAT_DECIMALS); //check if this format needs to be to 1e18 instead of 1e6
 
         try ozIDiamond(_ozDiamond).useUnderlying{value: msg.value}(asset(), owner_, amts, isETH_) returns(uint amountOutRETH, uint amountOutAUSDC) {
-            // _setValuePerOzToken(amountOutRETH, true);
             _setValuePerOzToken(amountOutRETH, amountOutAUSDC, true);
 
             uint shares = assets; //check if it's still necessary to have both shares and assets
@@ -278,8 +277,8 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
             revert OZError22(reason);
         }
     }
+    
     //-------------
-    // s.rewardsStartTime
     function _recordDeposit(address receiver_, uint amountETH_, uint amountStable_) private {
         ozIDiamond(_ozDiamond).recordDeposit(receiver_, amountETH_, amountStable_);
     } 

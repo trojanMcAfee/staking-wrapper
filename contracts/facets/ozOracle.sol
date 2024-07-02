@@ -72,36 +72,6 @@ contract ozOracle {
     }
 
 
-    // function executeRebaseSwap2() external {
-    //     if (s.rewardsStartTime < s.EPOCH) return;
-
-    //     uint ozDiamondBalanceRETH = IERC20Permit(s.rETH).balanceOf(address(this));
-    //     uint currPrice = getUniPrice(0, Dir.UP);
-    //     uint prevPrice = getUniPrice(0, Dir.DOWN);
-
-    //     uint dailyIncrease = (currPrice - prevPrice) / 7 days;
-
-    //     for (uint i=0; i < s.receivers.length; i++) {
-    //         address user = s.receivers[i];
-    //         Deposit[] memory deposits = s.deposits[user];
-
-    //         for (uint j=0; j < deposits.length; j++) {
-    //             Deposit memory deposit = deposits[j];
-    //         }
-    //     }
-
-    //     console.log('--- ** ---');
-    //     console.log('ozDiamondBalanceRETH: ', ozDiamondBalanceRETH);
-    //     console.log('dailyIncrease: ', dailyIncrease);
-    //     console.log('currPrice: ', currPrice);
-    //     console.log('prevPrice: ', prevPrice);
-
-    //     revert('here3');
-
-
-    //     s.rewardsStartTime = block.timestamp;
-    // }
-
     function recordDeposit(address receiver_, uint amountETH_, uint amountStable_) external {
         Deposit memory deposit = Deposit(amountETH_, amountStable_, block.timestamp, receiver_);
         s.deposits[receiver_].push(deposit);
