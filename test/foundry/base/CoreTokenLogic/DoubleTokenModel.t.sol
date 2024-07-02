@@ -52,7 +52,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         //Has to be a mock because balancer fails when swapping after warp
         //total rETH that'll be swapped, representing the staking rewards earned
         uint amountToSwapRETH = _balancerPart(halfAccrual, false);
-        _bobDeposit(ozERC20, amountIn);
+        _makeUserDeposit(bob, ozERC20, amountIn);
         //---------------------
 
         uint blockAccrual = halfAccrual + 4 days;
@@ -74,7 +74,7 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('');
         console.log('--------------------');
-        console.log('start of executeRebaseSwap');
+        console.log('start of 1st executeRebaseSwap');
         console.log('--------------------');
         console.log('');
 
@@ -93,6 +93,10 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('');
         console.log('bal alice oz: ', ozERC20.balanceOf(alice));
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
+
+        console.log('');
+        console.log('----- beginiing of CHARLIE -----');
+        
 
     }
 

@@ -90,16 +90,16 @@ contract HelpersLogic is TestMethods {
         //     abi.encode()
         // );
 
-    function _bobDeposit(ozIToken ozERC20, uint amountIn) internal {
-        bytes memory mintData = OZ.getMintData(amountIn, OZ.getDefaultSlippage(), bob, address(ozERC20));
+    function _makeUserDeposit(address sender_, ozIToken ozERC20, uint amountIn) internal {
+        bytes memory mintData = OZ.getMintData(amountIn, OZ.getDefaultSlippage(), sender_, address(ozERC20));
         (AmountsIn memory amts,) = abi.decode(mintData, (AmountsIn, address));
 
-        payable(bob).transfer(500 ether);
+        payable(sender_).transfer(500 ether);
 
-        vm.startPrank(bob);
+        vm.startPrank(sender_);
 
         IERC20(testToken).approve(address(OZ), amountIn);
-        ozERC20.mint2{value: amts.amountInETH}(mintData, bob, true);
+        ozERC20.mint2{value: amts.amountInETH}(mintData, sender_, true);
 
         vm.stopPrank();
     }

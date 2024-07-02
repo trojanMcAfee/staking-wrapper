@@ -191,8 +191,8 @@ contract ozLoupe is DiamondLoupeFacet {
     }
 
     //unite all AppStorage queries in one function
-    function getStakingRewardsUSDC() external view returns(uint) {
-        return s.stakingRewardsUSDC;
+    function getProtocolRewards() external view returns(uint) {
+        return s.protocolRewardsStable;
     }
 
     function getDeposits(address account_) external view returns(Deposit[] memory) {

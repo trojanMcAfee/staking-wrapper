@@ -94,7 +94,7 @@ struct AppStorage {
     mapping(address receiver => Deposit[] deposit) deposits;
     address[] receivers; 
     uint sysBalanceETH; //how much ETH has been deposited for minting ozTokens
-    uint stakingRewardsUSDC; //rebase comes from this value. When user redeems, they get their share of this
+    uint protocolRewardsStable; //rebase comes from this value. When user redeems, they get their share of this
 
     uint lastRebasePriceRETHETH; 
 

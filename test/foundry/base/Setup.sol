@@ -532,7 +532,7 @@ contract Setup is MockStorage, Test {
             selectors[15] = loupe.getEnabledSwitch.selector;
             selectors[16] = loupe.getPausedContracts.selector;
             selectors[17] = loupe.getAPR.selector;
-            selectors[18] = loupe.getStakingRewardsUSDC.selector;
+            selectors[18] = loupe.getProtocolRewards.selector;
             selectors[19] = loupe.getDeposits.selector;
             selectors[20] = loupe.getRewardsStartTime.selector;
             selectors[21] = loupe.getUserIndex.selector;

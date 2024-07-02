@@ -226,7 +226,7 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
         uint totalContributions = _OZ().queryDeposit(_OZ().getDepositIndex());
 
         uint share = (contributionFactor * 1 ether) / totalContributions;
-        uint userRewards = (share * _OZ().getStakingRewardsUSDC()) * 1e12;
+        uint userRewards = (share * _OZ().getProtocolRewards()) * 1e12;
         
         return (_assets[account_] * 1e12) + (userRewards / 1 ether);
     }
@@ -277,7 +277,7 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
             revert OZError22(reason);
         }
     }
-    
+
     //-------------
     function _recordDeposit(address receiver_, uint amountETH_, uint amountStable_) private {
         ozIDiamond(_ozDiamond).recordDeposit(receiver_, amountETH_, amountStable_);
