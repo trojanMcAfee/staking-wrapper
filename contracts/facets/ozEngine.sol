@@ -428,7 +428,7 @@ contract ozEngine is Modifiers {
         s.lastRebasePriceRETHETH = rateRETHETH; //check if this is used
         s.rewardsStartTime = block.timestamp;
 
-        console.log('staking rewards: ', s.protocolRewardsStable);
+        console.log('staking rewards: ', amountOutUSDC);
         console.log('lending rewards: ', lendingRwards);
         console.log('s.protocolRewardsStable (TOTAL) *****: ', s.protocolRewardsStable);
 

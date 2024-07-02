@@ -27,18 +27,7 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         (ozIToken ozERC20,) = _createOzTokens(testToken, "1");
 
-        bytes memory mintData = OZ.getMintData(amountIn, OZ.getDefaultSlippage(), alice, address(ozERC20));
-        (AmountsIn memory amts,) = abi.decode(mintData, (AmountsIn, address));
-
-        payable(alice).transfer(1000 ether);
-
-        vm.startPrank(alice);
-
-        //Alice mints ozERC20
-        IERC20(testToken).approve(address(OZ), amountIn);
-        ozERC20.mint2{value: amts.amountInETH}(mintData, alice, true);
-
-        vm.stopPrank();
+        _makeUserDeposit(alice, ozERC20, amountIn);
 
         uint oldRateRETH = OZ.rETH_ETH();
         console.log('rETH_ETH - pre epoch: ', oldRateRETH);
@@ -95,7 +84,12 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
 
         console.log('');
-        console.log('----- beginiing of CHARLIE -----');
+        console.log('***** beginning of CHARLIE *****');
+        console.log('');
+
+        amountIn = IERC20(testToken).balanceOf(charlie);
+        console.log('amountIn ^^^^: ', amountIn);
+        // _makeUserDeposit(charlie, ozERC20, amountIn);
         
 
     }
