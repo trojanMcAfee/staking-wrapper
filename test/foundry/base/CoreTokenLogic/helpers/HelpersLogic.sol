@@ -106,8 +106,8 @@ contract HelpersLogic is TestMethods {
 
 
     function _mock_aUSDC() internal {
-        uint amountToMock = IERC20(aUsdcAddr).balanceOf(address(OZ)).mulDivDown(800, 10_000);
-        console.log('amountToMock *******: ', amountToMock);
+        uint aUsdcBalance = IERC20(aUsdcAddr).balanceOf(address(OZ));
+        uint amountToMock = aUsdcBalance + aUsdcBalance.mulDivDown(800, 10_000);
 
         vm.mockCall( 
             aUsdcAddr,
