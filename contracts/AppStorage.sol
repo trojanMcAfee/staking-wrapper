@@ -108,9 +108,6 @@ struct AppStorage {
     uint size; //change this to treeSize and in ozFenwickTree and DiamondInit
 
 
-    //when making a deposit, put the deposit in this buffer, which adds to the real db when doing the rebaseSwap()
-    //so you'll end up with two dbs  for deposit: a buffer and a permanent one. 
-    //buffer gets cleared after each rebase
 }
 
 
@@ -131,8 +128,7 @@ struct Deposit {
 //for the contributionIndex in the tree
 struct User {
     uint index;
-    uint factor;
-    // address addr;
+    uint factor; //not used so far
 }
 
 struct Pair {

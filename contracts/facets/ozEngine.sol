@@ -436,6 +436,7 @@ contract ozEngine is Modifiers {
             Deposit memory deposit = s.depositsBuffer[i];
             address user = deposit.receiver;
             uint index = s.users[user].index + 1;
+            //^ this will always be the same. Find a way to increase it with every deposit coming from the same user
 
             int timeSpent = _triageTime(deposit.timestamp);
             uint contributionFactor = deposit.amountETH * uint(timeSpent);
@@ -453,6 +454,7 @@ contract ozEngine is Modifiers {
         for (uint i=0; i < length; i++) {
             address user = s.depositsBuffer[i].receiver;
             uint index = s.users[user].index;
+            //^ this index has to be unique per user
 
             if (s.contributionFactors[user][index] != 0 && checkedUsers.indexOf(user) < 0) {
                 uint userFactor = _queryFactor(user, index);
