@@ -340,7 +340,7 @@ contract ozEngine is Modifiers {
                     minAmountsOut_[1]
                 );
 
-                console.log('amountOut: ', amountOut);
+                console.log('amountOut after swapUni - USDC: ', amountOut);
             }
         }
     }

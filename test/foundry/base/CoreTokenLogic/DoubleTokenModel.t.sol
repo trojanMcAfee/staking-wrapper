@@ -21,6 +21,10 @@ contract DoubleTokenModelTest is HelpersLogic {
 
 
     function test_strategy_new() public {
+        console.log('');
+        console.log('ETH_USD: ', OZ.ETH_USD());
+        console.log('');
+
         //Pre-condition
         (uint rawAmount,,) = _dealUnderlying(Quantity.SMALL, false);
         uint amountIn = rawAmount * 10 ** IERC20Permit(testToken).decimals();   
@@ -63,6 +67,10 @@ contract DoubleTokenModelTest is HelpersLogic {
         uint oldBalanceRETH = IERC20(rEthAddr).balanceOf(address(OZ));
 
         console.log('');
+        console.log('ETH_USD: ', OZ.ETH_USD());
+        console.log('');
+
+        console.log('');
         console.log('--------------------');
         console.log('1st EXECUTE_REBASE');
         console.log('--------------------');
@@ -79,6 +87,9 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('sysBalanceRETH - post swap: ', newBalanceRETH);
         //**************** */
+        console.log('');
+        console.log('ETH_USD: ', OZ.ETH_USD());
+        console.log('');
 
         console.log('');
         console.log('bal alice oz: ', ozERC20.balanceOf(alice));
@@ -149,9 +160,12 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('--------------------');
         console.log('2nd EXECUTE_REBASE');
         console.log('--------------------');
-        // console.log('');
+        console.log('');
+
+        console.log('ETH_USD: ', OZ.ETH_USD());
 
         _balancerPart(blockAccrual, Rebase.FOURTH);
+        _uniswapPart();
         assertTrue(OZ.executeRebaseSwap()); 
 
         console.log('');

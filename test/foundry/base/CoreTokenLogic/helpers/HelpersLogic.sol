@@ -32,6 +32,18 @@ contract HelpersLogic is TestMethods {
             });
     }
 
+    function _uniswapPart() internal {
+        uint amountIn = 12056878172159974;
+        ISwapRouter.ExactInputSingleParams memory params = _constructUniSwap(amountIn);
+        uint amountOutUSDC = 42456258;
+
+        vm.mockCall(
+            swapRouterUni, 
+            abi.encodeWithSelector(ISwapRouter.exactInputSingle.selector, params), 
+            abi.encode(amountOutUSDC)
+        );
+    }
+
 
     function _constructBalancerSwap(Rebase num_) internal view returns(
         IVault.SingleSwap memory, 
