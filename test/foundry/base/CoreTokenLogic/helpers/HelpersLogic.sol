@@ -78,42 +78,83 @@ contract HelpersLogic is TestMethods {
         return (singleSwap, funds);
     }
 
-    function _balancerPart(uint blockAccrual, Rebase num_) internal returns(uint) {
-        (
-            IVault.SingleSwap memory singleSwap, 
-            IVault.FundManagement memory funds
-        ) = _constructBalancerSwap(num_);
-
-        // uint rateRETHETH;
+    function _getRebaseVars(Rebase num_) private view returns(uint, uint, uint, address) {
+        uint rateRETHETH;
         uint amountToSwap;
         uint swappedAmount;
         address tokenToDeal;
         uint minAmountOut = 0;
 
         if (num_ == Rebase.NONE) { //1st alice deposit mockCall
-            // rateRETHETH = 1111038024285138135;
+            rateRETHETH = 1111038024285138135;
             amountToSwap = 28398352812392632;
-            swappedAmount = amountToSwap.mulDivDown(1 ether, 1111038024285138135);
+            swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
             tokenToDeal = rEthAddr; //tokenOut
         } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
-            // rateRETHETH = 1154401364401861932;
+            rateRETHETH = 1154401364401861932;
             amountToSwap = 1924728482031253;
-            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = wethAddr;
         } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
-            // rateRETHETH = 1154401364401861932;
+            rateRETHETH = 1154401364401861932;
             amountToSwap = 42597529218588948;
-            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = rEthAddr;
             minAmountOut = 36715602458125128;
         } else if (num_ == Rebase.THIRD) { //charlie deposit
-            // rateRETHETH = 1154401364401861932;
+            rateRETHETH = 1154401364401861932;
             amountToSwap = 63896293827883422;
-            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             console.log('swappedAmount *******: ', swappedAmount);
             tokenToDeal = rEthAddr;
             minAmountOut = 18357801229062564;
         }
+
+        return (minAmountOut, swappedAmount, amountToSwap, tokenToDeal);
+    }
+
+    function _balancerPart(uint blockAccrual, Rebase num_) internal returns(uint) {
+        (
+            IVault.SingleSwap memory singleSwap, 
+            IVault.FundManagement memory funds
+        ) = _constructBalancerSwap(num_);
+
+        (
+            // uint rateRETHETH;
+            uint minAmountOut,
+            uint swappedAmount,
+            uint amountToSwap,
+            address tokenToDeal
+        ) = _getRebaseVars(num_);
+
+
+        // if (num_ == Rebase.NONE) { //1st alice deposit mockCall
+        //     // rateRETHETH = 1111038024285138135;
+        //     amountToSwap = 28398352812392632;
+        //     swappedAmount = amountToSwap.mulDivDown(1 ether, 1111038024285138135);
+        //     tokenToDeal = rEthAddr; //tokenOut
+        //     accumulatedRETH += swappedAmount;
+        // } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
+        //     // rateRETHETH = 1154401364401861932;
+        //     amountToSwap = 1924728482031253;
+        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+        //     tokenToDeal = wethAddr;
+        // } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
+        //     // rateRETHETH = 1154401364401861932;
+        //     amountToSwap = 42597529218588948;
+        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+        //     tokenToDeal = rEthAddr;
+        //     minAmountOut = 36715602458125128;
+        //     accumulatedRETH += swappedAmount;
+        // } else if (num_ == Rebase.THIRD) { //charlie deposit
+        //     // rateRETHETH = 1154401364401861932;
+        //     amountToSwap = 63896293827883422;
+        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+        //     console.log('swappedAmount *******: ', swappedAmount);
+        //     tokenToDeal = rEthAddr;
+        //     minAmountOut = 18357801229062564;
+        //     accumulatedRETH += swappedAmount;
+        // }
 
 
         console.log('');
@@ -131,24 +172,47 @@ contract HelpersLogic is TestMethods {
         // console.log('swappedAmount *****: ', swappedAmount);
         // console.log('');
 
-        vm.mockCall(
+        _continueMock(
+            singleSwap, 
+            funds,
+            minAmountOut,
+            blockAccrual,
+            swappedAmount,
+            tokenToDeal
+        );
+
+        // vm.mockCall( 
+        //     vaultBalancer,
+        //     abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, minAmountOut, blockAccrual),
+        //     abi.encode(swappedAmount)
+        // );
+
+        // // deal(tokenToDeal, address(OZ), IERC20(tokenToDeal).balanceOf(address(OZ)) + swappedAmount);
+        // deal(tokenToDeal, address(OZ), accumulatedRETH); 
+        // console.log('rETH bal OZ #############', IERC20(rEthAddr).balanceOf(address(OZ)));
+        return amountToSwap;
+    }
+
+    function _continueMock(
+        IVault.SingleSwap memory singleSwap, 
+        IVault.FundManagement memory funds,
+        uint minAmountOut,
+        uint blockAccrual,
+        uint swappedAmount,
+        address tokenToDeal
+    ) private {
+        vm.mockCall( 
             vaultBalancer,
             abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, minAmountOut, blockAccrual),
             abi.encode(swappedAmount)
         );
 
-        deal(tokenToDeal, address(OZ), swappedAmount);
-        return amountToSwap;
+        // deal(tokenToDeal, address(OZ), IERC20(tokenToDeal).balanceOf(address(OZ)) + swappedAmount);
+        deal(tokenToDeal, address(OZ), swappedAmount); 
+        console.log('rETH bal OZ #############', IERC20(rEthAddr).balanceOf(address(OZ)));
     }
 
-      //---- mock UNISWAP WETH<>USDC swap (not need for now since ETHUSD hasn't chan ged)----
-        // ISwapRouter.ExactInputSingleParams memory params = _constructUniSwap(swappedAmountWETH);
-
-        // vm.mockCall(
-        //     swapRouterUni,
-        //     abi.encodeWithSelector(ISwapRouter.exactInputSingle.selector, params),
-        //     abi.encode()
-        // );
+    
 
     function _makeUserDeposit(address sender_, ozIToken ozERC20, uint amountIn) internal {
         bytes memory mintData = OZ.getMintData(amountIn, OZ.getDefaultSlippage(), sender_, address(ozERC20));

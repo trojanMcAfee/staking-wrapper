@@ -107,6 +107,7 @@ struct AppStorage {
     mapping(address addr => User user) users;
     uint size; //change this to treeSize and in ozFenwickTree and DiamondInit
 
+    uint sysBalanceRETH;
 
 }
 

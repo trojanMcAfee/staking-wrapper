@@ -64,7 +64,7 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('');
         console.log('--------------------');
-        console.log('start of 1st executeRebaseSwap');
+        console.log('1st EXECUTE_REBASE');
         console.log('--------------------');
         console.log('');
 
@@ -132,12 +132,10 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('aUSDC balance diamond - post charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
         console.log('');
 
-        revert('here8');
-
         oldRateRETH = OZ.rETH_ETH();
         
         //2nd rewards accrual event
-        blockAccrual = block.timestamp + EPOCH;
+        blockAccrual = block.timestamp + 2 days;
         vm.warp(blockAccrual);
 
         _mock_rETH_ETH_diamond();
@@ -149,14 +147,17 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('');
         console.log('--------------------');
-        console.log('start of 2nd executeRebaseSwap');
+        console.log('2nd EXECUTE_REBASE');
         console.log('--------------------');
-        console.log('');
+        // console.log('');
 
         _balancerPart(blockAccrual, Rebase.SECOND);
         assertTrue(OZ.executeRebaseSwap()); 
 
-
+        console.log('');
+        console.log('bal alice oz: ', ozERC20.balanceOf(alice));
+        console.log('bal bob oz: ', ozERC20.balanceOf(bob));
+        console.log('bal charlie oz: ', ozERC20.balanceOf(charlie));
     }
 
 

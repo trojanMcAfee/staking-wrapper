@@ -126,7 +126,10 @@ contract ozEngine is Modifiers {
                 Action.OZ_IN //put an action that represents indifference, cross-check against _checkPauseAndSwap2() def
             );
 
+            s.sysBalanceRETH += amountOutRETH;
+
             console.log('amountOutRETH - swappedAmount: ', amountOutRETH);
+            console.log('s.sysBalanceRETH after useUnderlying(): ', s.sysBalanceRETH);
             console.log('');
         }
 
@@ -504,10 +507,10 @@ contract ozEngine is Modifiers {
         console.log('rateRETHETH: ', rateRETHETH);
         if (rateRETHETH <= s.lastRebasePriceRETHETH) return (0, 0);
 
-        uint sysBalanceRETH = IERC20Permit(s.rETH).balanceOf(address(this));
-        console.log('sysBalanceRETH - pre swap: ', sysBalanceRETH);
+        // uint sysBalanceRETH = IERC20Permit(s.rETH).balanceOf(address(this));
+        console.log('sysBalanceRETH - pre swap: ', s.sysBalanceRETH);
 
-        uint sysBalanceConvertedETH = sysBalanceRETH.mulDivDown(rateRETHETH, 1 ether);
+        uint sysBalanceConvertedETH = s.sysBalanceRETH.mulDivDown(rateRETHETH, 1 ether);
         console.log('sysBalanceConvertedETH: ', sysBalanceConvertedETH);
         console.log('');
         console.log('s.sysBalanceETH: ', s.sysBalanceETH);
