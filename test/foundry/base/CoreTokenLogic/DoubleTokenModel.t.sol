@@ -85,7 +85,9 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
 
         console.log('');
-        console.log('***** beginning of ALICE-CHARLIE DEPOSITS *****');
+        console.log('-------------------------');
+        console.log(' ALICE 2nd deposit ');
+        console.log('-------------------------');
         console.log('');
 
         amountIn = IERC20(testToken).balanceOf(charlie);
@@ -97,16 +99,31 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn alice: ', amountIn);
         console.log('aUSDC balance diamond - pre alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
-        _balancerPart(1719520943, Rebase.SECOND); 
+        _balancerPart(block.timestamp, Rebase.SECOND); 
         _makeUserDeposit(alice, ozERC20, amountIn);
         vm.clearMockedCalls();
 
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
 
         console.log('aUSDC balance diamond - post alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
-        revert('here5');
+
+        blockAccrual = block.timestamp + 5 days;
+        vm.warp(blockAccrual);
+
+        console.log('');
+        console.log('-------------------------');
+        console.log(' CHARLIE deposit ');
+        console.log('-------------------------');
+        console.log('');
+
+        _mock_rETH_ETH_diamond(); //setting the rate back to rebase since mocks were cleared
 
         amountIn = IERC20(testToken).balanceOf(charlie) / 2;
+        
+        console.log('amountIn charlie: ', amountIn);
+        console.log('rETH-ETH: ', OZ.rETH_ETH());
+
+        _balancerPart(block.timestamp, Rebase.THIRD); 
         _makeUserDeposit(charlie, ozERC20, amountIn);
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
 
@@ -114,6 +131,8 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn alice: ', amountIn);
         console.log('aUSDC balance diamond - post charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
         console.log('');
+
+        revert('here8');
 
         oldRateRETH = OZ.rETH_ETH();
         

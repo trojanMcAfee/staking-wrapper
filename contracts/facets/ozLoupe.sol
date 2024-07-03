@@ -140,7 +140,7 @@ contract ozLoupe is DiamondLoupeFacet {
         uint amountInStable_,
         uint16 slippage_,
         address receiver_,
-        address ozERC20_ //could be wozERC20
+        address ozERC20_ //could be wozERC20 also
     ) external view returns(bytes memory) {
         AmountsIn memory amts = quoteAmountsIn(amountInStable_, slippage_, ozIToken(ozERC20_).asset());
         return abi.encode(amts, receiver_);

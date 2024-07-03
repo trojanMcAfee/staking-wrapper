@@ -53,7 +53,11 @@ contract HelpersLogic is TestMethods {
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
             amountIn = 42597529218588948;
-        } 
+        } else if (num_ == Rebase.THIRD) { //charlie deposit
+            tokenIn = wethAddr;
+            tokenOut = rEthAddr;
+            amountIn = 63896293827883422;
+        }
 
         IVault.SingleSwap memory singleSwap = IVault.SingleSwap({
             poolId: IPool(rEthWethPoolBalancer).getPoolId(),
@@ -102,13 +106,15 @@ contract HelpersLogic is TestMethods {
             swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = rEthAddr;
             minAmountOut = 36715602458125128;
+        } else if (num_ == Rebase.THIRD) { //charlie deposit
+            // rateRETHETH = 1154401364401861932;
+            amountToSwap = 63896293827883422;
+            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+            console.log('swappedAmount *******: ', swappedAmount);
+            tokenToDeal = rEthAddr;
+            minAmountOut = 18357801229062564;
         }
-        // } else if (num_ == Rebase.THIRD) {
-        //     rateRETHETH = 1200577418977936409;
-        //     amountToSwap = 6150806820168135;
-        //     swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
-        //     tokenToDeal = wethAddr;
-        // }
+
 
         console.log('');
         // console.log('--- in _balancerPart ---');
