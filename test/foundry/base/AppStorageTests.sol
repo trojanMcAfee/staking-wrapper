@@ -28,7 +28,8 @@ enum Mock {
 enum Rebase {
     NONE,
     FIRST,
-    SECOND
+    SECOND,
+    THIRD
 }
 
 

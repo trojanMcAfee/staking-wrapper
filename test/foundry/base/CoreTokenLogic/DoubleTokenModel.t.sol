@@ -97,7 +97,12 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn alice: ', amountIn);
         console.log('aUSDC balance diamond - pre alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
+        // vm.clearMockedCalls();
+
+        _balancerPart(1719520943, Rebase.SECOND); 
         _makeUserDeposit(alice, ozERC20, amountIn);
+
+        revert('here4');
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
 
         console.log('aUSDC balance diamond - post alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
@@ -116,6 +121,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         //2nd rewards accrual event
         blockAccrual = block.timestamp + EPOCH;
         vm.warp(blockAccrual);
+
         _mock_rETH_ETH_diamond();
         _mock_aUSDC(Mock.LENDING_AAVE, 0); 
 
@@ -129,9 +135,9 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('--------------------');
         console.log('');
 
-        // assertTrue(OZ.executeRebaseSwap());
+        _balancerPart(blockAccrual, Rebase.SECOND);
+        assertTrue(OZ.executeRebaseSwap()); 
 
-        // _balancerPart(blockAccrual, isRebase_);
 
     }
 

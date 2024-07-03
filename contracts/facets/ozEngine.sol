@@ -115,7 +115,7 @@ contract ozEngine is Modifiers {
             minAmountsOut[0] = amts_.minAmountOutRETH;
             //*********/ <--- put this later on the offchain call's data to mint()
 
-            // console.log('amountInWETH ******: ', amountInWETH);
+            console.log('amountInWETH ******: ', amountInWETH);
 
             amountOutRETH = _checkPauseAndSwap2(
                 s.WETH, 
@@ -125,6 +125,8 @@ contract ozEngine is Modifiers {
                 minAmountsOut,
                 Action.OZ_IN //put an action that represents indifference, cross-check against _checkPauseAndSwap2() def
             );
+
+            console.log('amountOutRETH - swappedAmount: ', amountOutRETH);
         }
 
         uint amountOutAUSDC = _lendToAave(amountInStable, stable_);
@@ -315,6 +317,8 @@ contract ozEngine is Modifiers {
                 amountIn_,
                 minAmountOutFirstLeg
             );
+
+            console.log('amountOut after swapBalancer *******: ', amountOut);
         }
 
         if (type_ == Action.OZL_IN || type_ == Action.REBASE) {
@@ -387,7 +391,8 @@ contract ozEngine is Modifiers {
             toInternalBalance: false
         });
 
-        IERC20(tokenIn_).safeApprove(s.vaultBalancer, singleSwap.amount);
+        IERC20(tokenIn_).approve(s.vaultBalancer, singleSwap.amount);
+        // IERC20(tokenIn_).safeApprove(s.vaultBalancer, singleSwap.amount); //use this in prod - for safeApprove to work, allowance has to be reset to 0 on a mock. Can't be done on mockCall()
         amountOut = _executeSwap(singleSwap, funds, minAmountOut_, block.timestamp);
     }
     
@@ -400,9 +405,26 @@ contract ozEngine is Modifiers {
         uint blockStamp_
     ) private returns(uint) 
     {
+        console.log('');
+        console.log('--- in _executeSwap ---');
+        console.log('singleSwap_.amountIn: ', singleSwap_.amount);
+        console.log('singleSwap_.assetIn: ', address(singleSwap_.assetIn));
+        console.log('singleSwap_.assetOut: ', address(singleSwap_.assetOut));
+        console.logBytes32(singleSwap_.poolId);
+        console.logBytes(singleSwap_.userData);
+        console.log('sender: ', funds_.sender);
+        console.log('fromInternalBalance: ', funds_.fromInternalBalance);
+        console.log('recipient: ', funds_.recipient);
+        console.log('toInternalBalance: ', funds_.toInternalBalance);
+        console.log('blockStamp_: ', blockStamp_);
+        console.log('minAmountOut_: ', minAmountOut_);
+        console.log('');
         
         try IVault(s.vaultBalancer).swap(singleSwap_, funds_, minAmountOut_, blockStamp_) returns(uint amountOut) {
             if (amountOut == 0) revert OZError02();
+
+            console.log('amountOut just after swap: ', amountOut);
+
             return amountOut;
         } catch Error(string memory reason) {
             if (Helpers.compareStrings(reason, 'BAL#507')) {

@@ -45,15 +45,15 @@ contract HelpersLogic is TestMethods {
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
             amountIn = 28398352812392632;
-        } else if (num_ == Rebase.FIRST) {
+        } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
             tokenIn = rEthAddr;
             tokenOut = wethAddr;
             amountIn = 1924728482031253;
-        }
-
-        // IAsset tokenIn = IAsset(isRebase_ ? rEthAddr : wethAddr);
-        // IAsset tokenOut = IAsset(isRebase_ ? wethAddr : rEthAddr);
-        // uint amountIn = isRebase_ ? 1924728482031253 : 28398352812392632;
+        } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
+            tokenIn = wethAddr;
+            tokenOut = rEthAddr;
+            amountIn = 42597529218588948;
+        } 
 
         IVault.SingleSwap memory singleSwap = IVault.SingleSwap({
             poolId: IPool(rEthWethPoolBalancer).getPoolId(),
@@ -80,36 +80,58 @@ contract HelpersLogic is TestMethods {
             IVault.FundManagement memory funds
         ) = _constructBalancerSwap(num_);
 
-        uint rateRETHETH;
+        // uint rateRETHETH;
         uint amountToSwap;
         uint swappedAmount;
         address tokenToDeal;
+        uint minAmountOut = 0;
 
-        if (num_ == Rebase.NONE) {
-            rateRETHETH = 1111038024285138135;
+        if (num_ == Rebase.NONE) { //1st alice deposit mockCall
+            // rateRETHETH = 1111038024285138135;
             amountToSwap = 28398352812392632;
-            swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
-            tokenToDeal = rEthAddr;
-        } else if (num_ == Rebase.FIRST) {
-            rateRETHETH = 1154401364401861932;
+            swappedAmount = amountToSwap.mulDivDown(1 ether, 1111038024285138135);
+            tokenToDeal = rEthAddr; //tokenOut
+        } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
+            // rateRETHETH = 1154401364401861932;
             amountToSwap = 1924728482031253;
-            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
+            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = wethAddr;
+        } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
+            // rateRETHETH = 1154401364401861932;
+            amountToSwap = 42597529218588948;
+            swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
+            tokenToDeal = rEthAddr;
+            minAmountOut = 36715602458125128;
         }
+        // } else if (num_ == Rebase.THIRD) {
+        //     rateRETHETH = 1200577418977936409;
+        //     amountToSwap = 6150806820168135;
+        //     swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
+        //     tokenToDeal = wethAddr;
+        // }
 
-        // uint rateRETHETH = isRebase_ ? 1154401364401861932 : 1111038024285138135;
-        // uint amountToSwap = isRebase_ ? 1924728482031253 : 28398352812392632;
-        // uint swappedAmount = isRebase_ ? 
-        //     rateRETHETH.mulDivDown(amountToSwap, 1 ether) :
-        //     amountToSwap.mulDivDown(1 ether, rateRETHETH);
-        
+        console.log('');
+        // console.log('--- in _balancerPart ---');
+        // console.log('blockAccrual before mock: ', blockAccrual);
+        // console.log('singleSwap_.amountIn: ', singleSwap.amount);
+        // console.log('singleSwap_.assetIn: ', address(singleSwap.assetIn));
+        // console.log('singleSwap_.assetOut: ', address(singleSwap.assetOut));
+        // console.logBytes32(singleSwap.poolId);
+        // console.logBytes(singleSwap.userData);
+        // console.log('sender: ', funds.sender);
+        // console.log('fromInternalBalance: ', funds.fromInternalBalance);
+        // console.log('recipient: ', funds.recipient);
+        // console.log('toInternalBalance: ', funds.toInternalBalance);
+        // console.log('swappedAmount *****: ', swappedAmount);
+        // console.log('');
+
         vm.mockCall(
             vaultBalancer,
-            abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, 0, blockAccrual),
+            abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, minAmountOut, blockAccrual),
             abi.encode(swappedAmount)
         );
-        deal(tokenToDeal, address(OZ), swappedAmount);
 
+        deal(tokenToDeal, address(OZ), swappedAmount);
         return amountToSwap;
     }
 
