@@ -97,15 +97,14 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn alice: ', amountIn);
         console.log('aUSDC balance diamond - pre alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
-        // vm.clearMockedCalls();
-
         _balancerPart(1719520943, Rebase.SECOND); 
         _makeUserDeposit(alice, ozERC20, amountIn);
+        vm.clearMockedCalls();
 
-        revert('here4');
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
 
         console.log('aUSDC balance diamond - post alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+        revert('here5');
 
         amountIn = IERC20(testToken).balanceOf(charlie) / 2;
         _makeUserDeposit(charlie, ozERC20, amountIn);

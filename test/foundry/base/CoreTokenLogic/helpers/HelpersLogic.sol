@@ -161,6 +161,7 @@ contract HelpersLogic is TestMethods {
 
     function _mock_aUSDC(Mock mockType_, uint amountTokens_) internal {
         uint aUsdcBalance = IERC20(aUsdcAddr).balanceOf(address(OZ));
+        console.log('aUsdcBalance in mock_aUSDC: ', aUsdcBalance);
         uint amountToMock;
 
         if (mockType_ == Mock.LENDING_AAVE) {
@@ -174,6 +175,8 @@ contract HelpersLogic is TestMethods {
             abi.encodeWithSignature('balanceOf(address)', address(OZ)),
             abi.encode(amountToMock)
         ); 
+
+        console.log('amountToMock aUSDC ^^^^^^^^^^^^^: ', amountToMock);
     }
 
 }
