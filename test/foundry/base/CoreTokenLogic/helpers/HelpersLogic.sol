@@ -57,6 +57,10 @@ contract HelpersLogic is TestMethods {
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
             amountIn = 63896293827883422;
+        } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
+            tokenIn = rEthAddr;
+            tokenOut = wethAddr;
+            amountIn = 10042566169888582;
         }
 
         IVault.SingleSwap memory singleSwap = IVault.SingleSwap({
@@ -105,9 +109,14 @@ contract HelpersLogic is TestMethods {
             rateRETHETH = 1154401364401861932;
             amountToSwap = 63896293827883422;
             swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
-            console.log('swappedAmount *******: ', swappedAmount);
+            // console.log('swappedAmount *******: ', swappedAmount);
             tokenToDeal = rEthAddr;
             minAmountOut = 18357801229062564;
+        } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
+            rateRETHETH = 1200577418977936409;
+            amountToSwap = 10042566169888582;
+            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
+            tokenToDeal = wethAddr;
         }
 
         return (minAmountOut, swappedAmount, amountToSwap, tokenToDeal);

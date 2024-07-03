@@ -29,7 +29,8 @@ enum Rebase {
     NONE,
     FIRST,
     SECOND,
-    THIRD
+    THIRD,
+    FOURTH
 }
 
 

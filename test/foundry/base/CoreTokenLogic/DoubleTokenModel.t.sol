@@ -151,7 +151,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('--------------------');
         // console.log('');
 
-        _balancerPart(blockAccrual, Rebase.SECOND);
+        _balancerPart(blockAccrual, Rebase.FOURTH);
         assertTrue(OZ.executeRebaseSwap()); 
 
         console.log('');

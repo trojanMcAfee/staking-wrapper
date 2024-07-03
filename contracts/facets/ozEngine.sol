@@ -317,6 +317,7 @@ contract ozEngine is Modifiers {
                 minAmountOutFirstLeg
             );
         } else {   
+            console.log('amountIn_ rETH: ', amountIn_);
             amountOut = _swapBalancer(
                 tokenIn_,
                 tokenOutInternal, //tokenOut_
@@ -428,9 +429,6 @@ contract ozEngine is Modifiers {
         
         try IVault(s.vaultBalancer).swap(singleSwap_, funds_, minAmountOut_, blockStamp_) returns(uint amountOut) {
             if (amountOut == 0) revert OZError02();
-
-            console.log('amountOut just after swap: ', amountOut);
-
             return amountOut;
         } catch Error(string memory reason) {
             if (Helpers.compareStrings(reason, 'BAL#507')) {
