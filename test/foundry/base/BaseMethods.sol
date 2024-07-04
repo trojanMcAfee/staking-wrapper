@@ -462,6 +462,16 @@ contract BaseMethods is Setup {
         }
     }
 
+    function _mock_rETH_ETH_diamond_base() internal {
+        uint rETHETHmock = 1111038024285138135;
+
+        vm.mockCall( 
+            address(OZ),
+            abi.encodeWithSignature('rETH_ETH()'),
+            abi.encode(rETHETHmock)
+        ); 
+    }
+
     function _mock_rETH_ETH_diamond() internal {
         uint bpsIncrease = 400; //92 - 400
         uint rETHETHmock = OZ.rETH_ETH() + bpsIncrease.mulDivDown(OZ.rETH_ETH(), 10_000);
@@ -470,6 +480,16 @@ contract BaseMethods is Setup {
             address(OZ),
             abi.encodeWithSignature('rETH_ETH()'),
             abi.encode(rETHETHmock)
+        ); 
+    }
+
+    function _mock_ETH_USD_diamond() internal {
+        uint mockAmount = 3523878200000000000000;
+
+        vm.mockCall( 
+            address(OZ),
+            abi.encodeWithSignature('ETH_USD()'),
+            abi.encode(mockAmount)
         ); 
     }
 

@@ -53,14 +53,14 @@ contract HelpersLogic is TestMethods {
         address tokenOut;
         uint amountIn;
 
-        if (num_ == Rebase.NONE) {
+        if (num_ == Rebase.NONE) { //bob deposit
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
-            amountIn = 28398352812392632;
-        } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
+            amountIn = 28377825317571986;
+        } else if (num_ == Rebase.FIRST) { //1st executeRebaseSwap mockCall
             tokenIn = rEthAddr;
             tokenOut = wethAddr;
-            amountIn = 1924728482031253;
+            amountIn = 1951446751535458;
         } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
@@ -94,23 +94,25 @@ contract HelpersLogic is TestMethods {
         return (singleSwap, funds);
     }
 
-    function _getRebaseVars(Rebase num_) private view returns(uint, uint, uint, address) {
+    function _getRebaseVars(Rebase num_) private returns(uint, uint, uint, address) {
         uint rateRETHETH;
         uint amountToSwap;
         uint swappedAmount;
         address tokenToDeal;
-        uint minAmountOut = 0;
+        uint minAmountOut;
 
-        if (num_ == Rebase.NONE) { //1st alice deposit mockCall
+        if (num_ == Rebase.NONE) { //bob deposit
             rateRETHETH = 1111038024285138135;
-            amountToSwap = 28398352812392632;
+            amountToSwap = 28377825317571986;
             swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
             tokenToDeal = rEthAddr; //tokenOut
-        } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
+            minAmountOut =  25414014258559365;
+        } else if (num_ == Rebase.FIRST) { //1st executeRebaseSwap mockCall
             rateRETHETH = 1154401364401861932;
-            amountToSwap = 1924728482031253;
+            amountToSwap = 1951446751535458;
             swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = wethAddr;
+            minAmountOut = 0;
         } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
             rateRETHETH = 1154401364401861932;
             amountToSwap = 42597529218588948;
@@ -148,50 +150,7 @@ contract HelpersLogic is TestMethods {
             address tokenToDeal
         ) = _getRebaseVars(num_);
 
-
-        // if (num_ == Rebase.NONE) { //1st alice deposit mockCall
-        //     // rateRETHETH = 1111038024285138135;
-        //     amountToSwap = 28398352812392632;
-        //     swappedAmount = amountToSwap.mulDivDown(1 ether, 1111038024285138135);
-        //     tokenToDeal = rEthAddr; //tokenOut
-        //     accumulatedRETH += swappedAmount;
-        // } else if (num_ == Rebase.FIRST) { //executeRebaseSwap mockCall
-        //     // rateRETHETH = 1154401364401861932;
-        //     amountToSwap = 1924728482031253;
-        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
-        //     tokenToDeal = wethAddr;
-        // } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
-        //     // rateRETHETH = 1154401364401861932;
-        //     amountToSwap = 42597529218588948;
-        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
-        //     tokenToDeal = rEthAddr;
-        //     minAmountOut = 36715602458125128;
-        //     accumulatedRETH += swappedAmount;
-        // } else if (num_ == Rebase.THIRD) { //charlie deposit
-        //     // rateRETHETH = 1154401364401861932;
-        //     amountToSwap = 63896293827883422;
-        //     swappedAmount = uint(1154401364401861932).mulDivDown(amountToSwap, 1 ether);
-        //     console.log('swappedAmount *******: ', swappedAmount);
-        //     tokenToDeal = rEthAddr;
-        //     minAmountOut = 18357801229062564;
-        //     accumulatedRETH += swappedAmount;
-        // }
-
-
         console.log('');
-        // console.log('--- in _balancerPart ---');
-        // console.log('blockAccrual before mock: ', blockAccrual);
-        // console.log('singleSwap_.amountIn: ', singleSwap.amount);
-        // console.log('singleSwap_.assetIn: ', address(singleSwap.assetIn));
-        // console.log('singleSwap_.assetOut: ', address(singleSwap.assetOut));
-        // console.logBytes32(singleSwap.poolId);
-        // console.logBytes(singleSwap.userData);
-        // console.log('sender: ', funds.sender);
-        // console.log('fromInternalBalance: ', funds.fromInternalBalance);
-        // console.log('recipient: ', funds.recipient);
-        // console.log('toInternalBalance: ', funds.toInternalBalance);
-        // console.log('swappedAmount *****: ', swappedAmount);
-        // console.log('');
 
         _continueMock(
             singleSwap, 
@@ -202,15 +161,6 @@ contract HelpersLogic is TestMethods {
             tokenToDeal
         );
 
-        // vm.mockCall( 
-        //     vaultBalancer,
-        //     abi.encodeWithSelector(IVault.swap.selector, singleSwap, funds, minAmountOut, blockAccrual),
-        //     abi.encode(swappedAmount)
-        // );
-
-        // // deal(tokenToDeal, address(OZ), IERC20(tokenToDeal).balanceOf(address(OZ)) + swappedAmount);
-        // deal(tokenToDeal, address(OZ), accumulatedRETH); 
-        // console.log('rETH bal OZ #############', IERC20(rEthAddr).balanceOf(address(OZ)));
         return amountToSwap;
     }
 
@@ -252,7 +202,7 @@ contract HelpersLogic is TestMethods {
 
     function _mock_aUSDC(Mock mockType_, uint amountTokens_) internal {
         uint aUsdcBalance = IERC20(aUsdcAddr).balanceOf(address(OZ));
-        console.log('aUsdcBalance in mock_aUSDC: ', aUsdcBalance);
+        console.log('aUsdcBalance in mock_aUSDC before mock: ', aUsdcBalance);
         uint amountToMock;
 
         if (mockType_ == Mock.LENDING_AAVE) {

@@ -133,10 +133,11 @@ contract ozEngine is Modifiers {
             console.log('');
         }
 
+        console.log('aUSDC bal pre lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
         uint amountOutAUSDC = _lendToAave(amountInStable, stable_);
         console.log('amountOutAUSDC: ', amountOutAUSDC);
         console.log('amountInStable: ', amountInStable);
-        console.log('aUSDC bal after lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
+        console.log('aUSDC bal post lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
 
         return (amountOutRETH, amountOutAUSDC);
     }
@@ -413,20 +414,20 @@ contract ozEngine is Modifiers {
         uint blockStamp_
     ) private returns(uint) 
     {
-        // console.log('');
-        // console.log('--- in _executeSwap ---');
-        // console.log('singleSwap_.amountIn: ', singleSwap_.amount);
-        // console.log('singleSwap_.assetIn: ', address(singleSwap_.assetIn));
-        // console.log('singleSwap_.assetOut: ', address(singleSwap_.assetOut));
-        // console.logBytes32(singleSwap_.poolId);
-        // console.logBytes(singleSwap_.userData);
-        // console.log('sender: ', funds_.sender);
-        // console.log('fromInternalBalance: ', funds_.fromInternalBalance);
-        // console.log('recipient: ', funds_.recipient);
-        // console.log('toInternalBalance: ', funds_.toInternalBalance);
-        // console.log('blockStamp_: ', blockStamp_);
-        // console.log('minAmountOut_: ', minAmountOut_);
-        // console.log('');
+        console.log('');
+        console.log('--- in _executeSwap ---');
+        console.log('singleSwap_.amountIn: ', singleSwap_.amount);
+        console.log('singleSwap_.assetIn: ', address(singleSwap_.assetIn));
+        console.log('singleSwap_.assetOut: ', address(singleSwap_.assetOut));
+        console.logBytes32(singleSwap_.poolId);
+        console.logBytes(singleSwap_.userData);
+        console.log('sender: ', funds_.sender);
+        console.log('fromInternalBalance: ', funds_.fromInternalBalance);
+        console.log('recipient: ', funds_.recipient);
+        console.log('toInternalBalance: ', funds_.toInternalBalance);
+        console.log('blockStamp_: ', blockStamp_);
+        console.log('minAmountOut_: ', minAmountOut_);
+        console.log('');
         
         try IVault(s.vaultBalancer).swap(singleSwap_, funds_, minAmountOut_, blockStamp_) returns(uint amountOut) {
             if (amountOut == 0) revert OZError02();
@@ -525,8 +526,10 @@ contract ozEngine is Modifiers {
         //******/
 
         console.log('');
-        console.log('**** SWAP ****');
+        console.log('**** SWAP for rETH to USD for staking rewards ****');
         console.log('');
+        
+        console.log('amountToSwapRETH in _calculateStakingRewards: ', amountToSwapRETH);
 
         uint amountOutUSDC = _checkPauseAndSwap2(
             s.rETH,

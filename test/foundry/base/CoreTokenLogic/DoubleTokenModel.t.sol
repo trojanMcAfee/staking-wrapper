@@ -25,6 +25,9 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('ETH_USD: ', OZ.ETH_USD());
         console.log('');
 
+        _mock_ETH_USD_diamond();
+        _mock_rETH_ETH_diamond_base();
+
         console.log('-------------------------');
         console.log(' ALICE 1st deposit ');
         console.log('-------------------------');
@@ -52,6 +55,7 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log(' BOB deposit ');
         console.log('-------------------------');
 
+        console.log('block before _balancerPart: ', halfAccrual);
         uint amountToSwapRETH = _balancerPart(halfAccrual, Rebase.NONE);
         _makeUserDeposit(bob, ozERC20, amountIn);
 
@@ -59,17 +63,19 @@ contract DoubleTokenModelTest is HelpersLogic {
         vm.warp(blockAccrual);
 
         console.log('');
-        console.log('*** MOCK ***');
+        console.log('*** MOCK rETH with staking rewards ***');
 
         _mock_rETH_ETH_diamond();
 
         assertTrue(oldRateRETH < OZ.rETH_ETH());
         
         //---- mock BALANCER rETH > WETH swap ----
+        console.log('block before _balancerPart: ', blockAccrual);
         amountToSwapRETH = _balancerPart(blockAccrual, Rebase.FIRST);
 
         //--------------------------------------
         console.log('rETH_ETH - post 1st epoch: ', OZ.rETH_ETH());
+        deal(rEthAddr, address(OZ), 51070144584081583);
         uint oldBalanceRETH = IERC20(rEthAddr).balanceOf(address(OZ));
 
         console.log('');
@@ -86,12 +92,17 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         assertTrue(OZ.executeRebaseSwap());
 
-        deal(rEthAddr, address(OZ), IERC20(rEthAddr).balanceOf(address(OZ)) - amountToSwapRETH); //add both deposits here
-        
+        // deal(rEthAddr, address(OZ), IERC20(rEthAddr).balanceOf(address(OZ)) - amountToSwapRETH); 
+        deal(rEthAddr, address(OZ), oldBalanceRETH - amountToSwapRETH);
+
         uint newBalanceRETH = IERC20Permit(rEthAddr).balanceOf(address(OZ));
+        console.log('sysBalanceRETH - post swap: ', newBalanceRETH);
+        console.log('oldBalanceRETH: ', oldBalanceRETH);
+
         assertTrue(oldBalanceRETH > newBalanceRETH);
 
-        console.log('sysBalanceRETH - post swap: ', newBalanceRETH);
+        //------ continue here. All working good so far (terminal)
+
         //**************** */
         console.log('');
         console.log('ETH_USD: ', OZ.ETH_USD());
@@ -119,9 +130,13 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn alice: ', amountIn);
         console.log('aUSDC balance diamond - pre alice deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
 
+        console.log('block before _balancerPart: ', block.timestamp);
         _balancerPart(block.timestamp, Rebase.SECOND); 
         _makeUserDeposit(alice, ozERC20, amountIn);
         vm.clearMockedCalls();
+
+        _mock_ETH_USD_diamond();
+        _mock_rETH_ETH_diamond_base();
 
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 
 
