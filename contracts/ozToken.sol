@@ -109,6 +109,10 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
     }
 
 
+    function userAssets(address account_) external view returns(uint) {
+        return _assets[account_];
+    }
+
     function name() public view returns (string memory) {
         return _name;
     }

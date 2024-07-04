@@ -66,6 +66,15 @@ contract ozLoupe is DiamondLoupeFacet {
         uint expectedOutRETH = amountInETH.mulDivDown(1 ether, Helpers.rETH_ETH(OZ));
         uint minAmountOutRETH = expectedOutRETH - expectedOutRETH.mulDivDown(uint(slippage_), 10_000);
 
+        console.log('');
+        console.log('--- in quoteAmountsIn ozLoupe ---');
+        console.log('ETH_USD: ', OZ.ETH_USD());
+        console.log('amountInETH: ', amountInETH);
+        console.log('rETH_ETH: ', Helpers.rETH_ETH(OZ));
+        console.log('expectedOutRETH: ', expectedOutRETH);
+        console.log('minAmountOutRETH: ', minAmountOutRETH);
+        console.log('');
+
         return AmountsIn(amountInStable_, amountInETH, minAmountOutRETH);
     }
 

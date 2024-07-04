@@ -136,6 +136,7 @@ contract ozEngine is Modifiers {
         uint amountOutAUSDC = _lendToAave(amountInStable, stable_);
         console.log('amountOutAUSDC: ', amountOutAUSDC);
         console.log('amountInStable: ', amountInStable);
+        console.log('aUSDC bal after lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
 
         return (amountOutRETH, amountOutAUSDC);
     }

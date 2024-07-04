@@ -25,6 +25,11 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('ETH_USD: ', OZ.ETH_USD());
         console.log('');
 
+        console.log('-------------------------');
+        console.log(' ALICE 1st deposit ');
+        console.log('-------------------------');
+        console.log('');
+
         //Pre-condition
         (uint rawAmount,,) = _dealUnderlying(Quantity.SMALL, false);
         uint amountIn = rawAmount * 10 ** IERC20Permit(testToken).decimals();   
@@ -42,12 +47,13 @@ contract DoubleTokenModelTest is HelpersLogic {
         uint halfAccrual = block.timestamp + 3 days;
         vm.warp(halfAccrual);
 
-        //---- mock BALANCER WETH > rETH swap ----
-        //Has to be a mock because balancer fails when swapping after warp
-        //total rETH that'll be swapped, representing the staking rewards earned
+        console.log('');
+        console.log('-------------------------');
+        console.log(' BOB deposit ');
+        console.log('-------------------------');
+
         uint amountToSwapRETH = _balancerPart(halfAccrual, Rebase.NONE);
         _makeUserDeposit(bob, ozERC20, amountIn);
-        //---------------------
 
         uint blockAccrual = halfAccrual + 4 days;
         vm.warp(blockAccrual);
@@ -93,7 +99,10 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('');
         console.log('bal alice oz: ', ozERC20.balanceOf(alice));
+        console.log('stables alice: ', ozERC20.userAssets(alice));
+        console.log('');
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
+        console.log('stables bob: ', ozERC20.userAssets(bob));
 
         console.log('');
         console.log('-------------------------');
@@ -120,6 +129,13 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         blockAccrual = block.timestamp + 5 days;
         vm.warp(blockAccrual);
+
+        console.log('');
+        console.log('bal alice oz: ', ozERC20.balanceOf(alice));
+        console.log('stables alice: ', ozERC20.userAssets(alice));
+        console.log('');
+        console.log('bal bob oz: ', ozERC20.balanceOf(bob));
+        console.log('stables bob: ', ozERC20.userAssets(bob));
 
         console.log('');
         console.log('-------------------------');
@@ -170,8 +186,13 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         console.log('');
         console.log('bal alice oz: ', ozERC20.balanceOf(alice));
+        console.log('stables alice: ', ozERC20.userAssets(alice));
+        console.log('');
         console.log('bal bob oz: ', ozERC20.balanceOf(bob));
+        console.log('stables bob: ', ozERC20.userAssets(bob));
+        console.log('');
         console.log('bal charlie oz: ', ozERC20.balanceOf(charlie));
+        console.log('stables charlie: ', ozERC20.userAssets(charlie));
     }
 
 
