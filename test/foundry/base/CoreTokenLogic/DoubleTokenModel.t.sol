@@ -163,6 +163,8 @@ contract DoubleTokenModelTest is HelpersLogic {
         console.log('amountIn charlie: ', amountIn);
         console.log('rETH-ETH: ', OZ.rETH_ETH());
 
+        console.log('aUSDC balance diamond - pre charlie deposit: ', IERC20(aUsdcAddr).balanceOf(address(OZ)));
+
         _balancerPart(block.timestamp, Rebase.THIRD); 
         _makeUserDeposit(charlie, ozERC20, amountIn);
         _mock_aUSDC(Mock.ADD_AAVE, amountIn); 

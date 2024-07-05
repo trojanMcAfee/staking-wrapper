@@ -33,9 +33,15 @@ contract HelpersLogic is TestMethods {
     }
 
     function _uniswapPart() internal {
-        uint amountIn = 12056878172159974;
-        ISwapRouter.ExactInputSingleParams memory params = _constructUniSwap(amountIn);
-        uint amountOutUSDC = 42456258;
+        uint amountInWETH = 51438688876658346;
+        uint rateETHUSD = 3523878200000000000000;
+        ISwapRouter.ExactInputSingleParams memory params = _constructUniSwap(amountInWETH);
+        // uint amountOutUSDC = 42456258;
+        uint amountOutUSDC = amountInWETH.mulDivDown(rateETHUSD, 1 ether) / 1e12;
+        console.log('amountOutUSDC in uniswapPart ^^^^^^^^: ', amountOutUSDC);
+
+        // 1 eth --- rateETHUSD
+        // amountInWETH -- x
 
         vm.mockCall(
             swapRouterUni, 
@@ -72,7 +78,7 @@ contract HelpersLogic is TestMethods {
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
             tokenIn = rEthAddr;
             tokenOut = wethAddr;
-            amountIn = 10042566169888582;
+            amountIn = 42804979083412762;
         }
 
         IVault.SingleSwap memory singleSwap = IVault.SingleSwap({
@@ -128,10 +134,11 @@ contract HelpersLogic is TestMethods {
             tokenToDeal = rEthAddr;
             minAmountOut = 18327414128768773;
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
-            rateRETHETH = 1200577418977936409;
-            amountToSwap = 10042566169888582;
+            rateRETHETH = 1201698727066805406;
+            amountToSwap = 42804979083412762;
             swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = wethAddr;
+            minAmountOut = 0;
         }
 
         return (minAmountOut, swappedAmount, amountToSwap, tokenToDeal);
