@@ -68,7 +68,7 @@ contract HelpersLogic is TestMethods {
         } else if (num_ == Rebase.THIRD) { //charlie deposit
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
-            amountIn = 63896293827883422;
+            amountIn = 21283368988178989;
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
             tokenIn = rEthAddr;
             tokenOut = wethAddr;
@@ -120,12 +120,12 @@ contract HelpersLogic is TestMethods {
             tokenToDeal = rEthAddr;
             minAmountOut = 36715602458125128;
         } else if (num_ == Rebase.THIRD) { //charlie deposit
-            rateRETHETH = 1154401364401861932;
-            amountToSwap = 63896293827883422;
-            swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
-            // console.log('swappedAmount *******: ', swappedAmount);
+            rateRETHETH = 1155479545256543660;
+            amountToSwap = 21283368988178989; //weth
+            swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
+            // console.log('swappedAmount: ^^^^^^^^^^^^^^^: ', swappedAmount);
             tokenToDeal = rEthAddr;
-            minAmountOut = 18357801229062564;
+            minAmountOut = 18327414128768773;
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
             rateRETHETH = 1200577418977936409;
             amountToSwap = 10042566169888582;

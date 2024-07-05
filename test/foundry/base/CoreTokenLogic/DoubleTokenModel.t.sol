@@ -101,8 +101,6 @@ contract DoubleTokenModelTest is HelpersLogic {
 
         assertTrue(oldBalanceRETH > newBalanceRETH);
 
-        //------ continue here. All working good so far (terminal)
-
         //**************** */
         console.log('');
         console.log('ETH_USD: ', OZ.ETH_USD());

@@ -449,14 +449,14 @@ contract ozEngine is Modifiers {
         (uint amountOutUSDC, uint rateRETHETH) = _calculateStakingRewards();
         if (amountOutUSDC == 0 && rateRETHETH == 0) return false;
 
-        uint lendingRwards = _calculateLendingRewards();
+        uint lendingRewards = _calculateLendingRewards();
 
-        s.protocolRewardsStable += amountOutUSDC + lendingRwards;
+        s.protocolRewardsStable += amountOutUSDC + lendingRewards;
         s.lastRebasePriceRETHETH = rateRETHETH; //check if this is used
         s.rewardsStartTime = block.timestamp;
 
         console.log('staking rewards: ', amountOutUSDC);
-        console.log('lending rewards: ', lendingRwards);
+        console.log('lending rewards: ', lendingRewards);
         console.log('s.protocolRewardsStable (TOTAL) *****: ', s.protocolRewardsStable);
 
         //emit rebase event here
