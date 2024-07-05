@@ -133,11 +133,11 @@ contract ozEngine is Modifiers {
             console.log('');
         }
 
-        console.log('aUSDC bal pre lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
+        // console.log('aUSDC bal pre lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
         uint amountOutAUSDC = _lendToAave(amountInStable, stable_);
         console.log('amountOutAUSDC: ', amountOutAUSDC);
         console.log('amountInStable: ', amountInStable);
-        console.log('aUSDC bal post lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
+        // console.log('aUSDC bal post lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
 
         return (amountOutRETH, amountOutAUSDC);
     }

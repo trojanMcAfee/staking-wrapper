@@ -68,7 +68,7 @@ contract HelpersLogic is TestMethods {
         } else if (num_ == Rebase.THIRD) { //charlie deposit
             tokenIn = wethAddr;
             tokenOut = rEthAddr;
-            amountIn = 21283368988178989;
+            amountIn = 63850106964536968;
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
             tokenIn = rEthAddr;
             tokenOut = wethAddr;
@@ -94,7 +94,7 @@ contract HelpersLogic is TestMethods {
         return (singleSwap, funds);
     }
 
-    function _getRebaseVars(Rebase num_) private returns(uint, uint, uint, address) {
+    function _getRebaseVars(Rebase num_) private view returns(uint, uint, uint, address) {
         uint rateRETHETH;
         uint amountToSwap;
         uint swappedAmount;
@@ -108,23 +108,23 @@ contract HelpersLogic is TestMethods {
             tokenToDeal = rEthAddr; //tokenOut
             minAmountOut =  25414014258559365;
         } else if (num_ == Rebase.FIRST) { //1st executeRebaseSwap mockCall
-            rateRETHETH = 1154401364401861932;
+            rateRETHETH = 1155479545256543660;
             amountToSwap = 1951446751535458;
             swappedAmount = rateRETHETH.mulDivDown(amountToSwap, 1 ether);
             tokenToDeal = wethAddr;
             minAmountOut = 0;
         } else if (num_ == Rebase.SECOND) { //2nd alice deposit mockCall
-            rateRETHETH = 1154401364401861932;
+            rateRETHETH = 1155479545256543660;
             amountToSwap = 42566737976357979;
             swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
-            console.log('swappedAmount: !!!!!!!!!!!! ', swappedAmount);
+            console.log('swappedAmount: ^^^^^^^^^ ', swappedAmount);
             tokenToDeal = rEthAddr;
             minAmountOut = 36654828257537545;
         } else if (num_ == Rebase.THIRD) { //charlie deposit
             rateRETHETH = 1155479545256543660;
-            amountToSwap = 21283368988178989; //weth
+            amountToSwap = 63850106964536968; //weth
             swappedAmount = amountToSwap.mulDivDown(1 ether, rateRETHETH);
-            // console.log('swappedAmount: ^^^^^^^^^^^^^^^: ', swappedAmount);
+            console.log('swappedAmount: !!!!!!!!! ', swappedAmount);
             tokenToDeal = rEthAddr;
             minAmountOut = 18327414128768773;
         } else if (num_ == Rebase.FOURTH) { //2nd executeRebaseSwap mockCall
