@@ -451,12 +451,19 @@ contract ozEngine is Modifiers {
 
         uint lendingRewards = _calculateLendingRewards();
 
+        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
+        // console.log('s.protocolRewardsStable = s.protocolRewardsStable: ', s.protocolRewardsStable + amountOutUSDC + lendingRewards);
         s.protocolRewardsStable += amountOutUSDC + lendingRewards;
         s.lastRebasePriceRETHETH = rateRETHETH; //check if this is used
         s.rewardsStartTime = block.timestamp;
 
+        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
+
         console.log('staking rewards: ', amountOutUSDC);
+        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
         console.log('lending rewards: ', lendingRewards);
+        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
+        console.log('amountOutUSDC + lendingRewards: ', amountOutUSDC + lendingRewards);
         console.log('s.protocolRewardsStable (TOTAL) *****: ', s.protocolRewardsStable);
 
         //emit rebase event here
