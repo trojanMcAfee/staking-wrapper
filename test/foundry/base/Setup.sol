@@ -602,9 +602,9 @@ contract Setup is MockStorage, Test {
             selectors[10] = rewardsContract.addToCirculatingSupply.selector;
         } else if (id_ == 11) {
             selectors[0] = tree.updateDeposit.selector;
-            selectors[1] = tree.updateFactor.selector;
+            selectors[1] = tree.updateUserFactor.selector;
             selectors[2] = tree.queryDeposit.selector;
-            selectors[3] = tree.queryFactor.selector;
+            selectors[3] = tree.queryUserFactor.selector;
         }
 
         cut = IDiamondCut.FacetCut({
@@ -667,6 +667,7 @@ contract Setup is MockStorage, Test {
         vm.label(address(engine), "ozEngine");
         vm.label(owner, "owner"); 
         vm.label(alice, "Alice");
+        vm.label(charlie, "Charlie");
         vm.label(bob, "Bob");
         vm.label(usdcAddr, "USDCproxy");
         vm.label(usdtAddr, "USDT");

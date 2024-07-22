@@ -226,7 +226,7 @@ contract ozToken is Modifiers, IERC20MetadataUpgradeable, IERC20PermitUpgradeabl
     function balanceOf(address account_) public view returns(uint) {
         uint index = _OZ().getUserIndex(account_);
 
-        uint contributionFactor = _OZ().queryFactor(account_, index);
+        uint contributionFactor = _OZ().queryUserFactor(account_, index);
         uint totalContributions = _OZ().queryDeposit(_OZ().getDepositIndex());
 
         uint share = (contributionFactor * 1 ether) / totalContributions;

@@ -177,8 +177,8 @@ interface ozIDiamond {
     function getRewardsStartTime() external view returns(uint);
 
     function queryDeposit(uint index_) external view returns (uint sum);
-    function queryFactor(address user_, uint index_) external view returns (uint sum);
-    function updateFactor(address user, uint256 index, uint256 value) external;
+    function queryUserFactor(address user_, uint index_) external view returns (uint sum);
+    function updateUserFactor(address user, uint256 index, uint256 value) external;
     function updateDeposit(uint256 index, uint256 value) external;
     function getUserIndex(address account_) external view returns(uint);
     function getDepositIndex() external view returns(uint);

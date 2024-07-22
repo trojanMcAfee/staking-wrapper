@@ -139,6 +139,8 @@ contract ozEngine is Modifiers {
         console.log('amountInStable: ', amountInStable);
         // console.log('aUSDC bal post lendAave: ', IERC20(s.aUSDC).balanceOf(address(this)));
 
+        s.depositIndex++;
+
         return (amountOutRETH, amountOutAUSDC);
     }
 
@@ -451,18 +453,12 @@ contract ozEngine is Modifiers {
 
         uint lendingRewards = _calculateLendingRewards();
 
-        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
-        // console.log('s.protocolRewardsStable = s.protocolRewardsStable: ', s.protocolRewardsStable + amountOutUSDC + lendingRewards);
         s.protocolRewardsStable += amountOutUSDC + lendingRewards;
         s.lastRebasePriceRETHETH = rateRETHETH; //check if this is used
         s.rewardsStartTime = block.timestamp;
 
-        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
-
         console.log('staking rewards: ', amountOutUSDC);
-        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
         console.log('lending rewards: ', lendingRewards);
-        // console.log('s.protocolRewardsStable: ', s.protocolRewardsStable);
         console.log('amountOutUSDC + lendingRewards: ', amountOutUSDC + lendingRewards);
         console.log('s.protocolRewardsStable (TOTAL) *****: ', s.protocolRewardsStable);
 
@@ -470,20 +466,31 @@ contract ozEngine is Modifiers {
 
         if (s.depositIndex <= 0) return false;
 
+        console.log('');
+        console.log('***** befores starting TREE ITERATIONS *****');
+        console.log('');
+
         for (uint i=0; i < s.depositsBuffer.length; i++) {
             Deposit memory deposit = s.depositsBuffer[i];
             address user = deposit.receiver;
             uint index = s.users[user].index + 1;
+            console.log('index in s.depositsBuffer + 1: ', index);
+            console.log('user: ', user);
             //^ this will always be the same. Find a way to increase it with every deposit coming from the same user
 
             int timeSpent = _triageTime(deposit.timestamp);
             uint contributionFactor = deposit.amountETH * uint(timeSpent);
 
-            _updateFactor(user, index, contributionFactor);
+            _updateUserFactor(user, index, contributionFactor);
 
             s.deposits[user].push(deposit); //this var might not be used/useful anymore
             s.users[user].index++;
+            console.log('index after ++: ', s.users[user].index);
         }
+
+        console.log('');
+        console.log('***** mid point of TREE ITERATIONS *****');
+        console.log('');
 
         uint length = s.depositsBuffer.length; 
         address[] memory checkedUsers = new address[](length);
@@ -492,18 +499,28 @@ contract ozEngine is Modifiers {
         for (uint i=0; i < length; i++) {
             address user = s.depositsBuffer[i].receiver;
             uint index = s.users[user].index;
+            console.log('index in 2nd s.depositsBuffer: ', index);
+            console.log('user: ', user);
             //^ this index has to be unique per user
 
             if (s.contributionFactors[user][index] != 0 && checkedUsers.indexOf(user) < 0) {
-                uint userFactor = _queryFactor(user, index);
+                uint userFactor = _queryUserFactor(user, index);
+                console.log('userFactor: ', userFactor);
+                console.log('s.depositIndex: ', s.depositIndex);
+
                 _updateDeposit(s.depositIndex, userFactor);
 
                 checkedUsers[checkedUsers.length - checked_length] = user;
-                s.depositIndex++;
+                // s.depositIndex++;
                 checked_length--;
             }
         }
         delete s.depositsBuffer;
+
+        console.log('');
+        console.log('***** end of TREE ITERATIONS *****');
+        console.log('');
+
         return true;
     }
 
@@ -579,9 +596,9 @@ contract ozEngine is Modifiers {
         return timeSpent;
     }
 
-    function _updateFactor(address user_, uint index_, uint value_) private {
+    function _updateUserFactor(address user_, uint index_, uint value_) private {
         address(this).functionCall(
-            abi.encodeWithSelector(ozIDiamond.updateFactor.selector, user_, index_, value_)
+            abi.encodeWithSelector(ozIDiamond.updateUserFactor.selector, user_, index_, value_)
         );
     }
 
@@ -598,9 +615,9 @@ contract ozEngine is Modifiers {
         );
     }
 
-    function _queryFactor(address user_, uint index_) private returns(uint) {
+    function _queryUserFactor(address user_, uint index_) private returns(uint) {
         bytes memory returnData = address(this).functionCall(
-            abi.encodeWithSelector(ozIDiamond.queryFactor.selector, user_, index_)
+            abi.encodeWithSelector(ozIDiamond.queryUserFactor.selector, user_, index_)
         );
         return abi.decode(returnData, (uint));
     }

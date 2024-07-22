@@ -24,8 +24,18 @@ contract ozFenwickTree {
         }
     }
 
+    function queryDeposit(uint256 index) external view returns (uint256 sum) {
+        if (index <= 0 && index > s.size) revert OZError44();
+        uint256 localIndex = index; 
+
+        while (localIndex > 0) {
+            sum += s.depositTree[localIndex];
+            localIndex -= localIndex & (~localIndex + 1); // Move to the parent index
+        }
+    }
+
     //Fix sintax in all of these functions
-    function updateFactor(address user, uint256 index, uint256 value) external {
+    function updateUserFactor(address user, uint256 index, uint256 value) external {
         if (index <= 0 && index > s.size) revert OZError44();
         uint256 localIndex = index; 
         uint256 cachedSize = s.size; 
@@ -37,23 +47,12 @@ contract ozFenwickTree {
     }
 
 
-    function queryFactor(address user, uint256 index) external view returns (uint256 sum) {
+    function queryUserFactor(address user, uint256 index) external view returns (uint256 sum) {
         if (index <= 0 && index > s.size) revert OZError44();
         uint256 localIndex = index; 
 
         while (localIndex > 0) {
             sum += s.contributionFactors[user][localIndex];
-            localIndex -= localIndex & (~localIndex + 1); // Move to the parent index
-        }
-    }
-
-
-    function queryDeposit(uint256 index) external view returns (uint256 sum) {
-        if (index <= 0 && index > s.size) revert OZError44();
-        uint256 localIndex = index; 
-
-        while (localIndex > 0) {
-            sum += s.depositTree[localIndex];
             localIndex -= localIndex & (~localIndex + 1); // Move to the parent index
         }
     }
